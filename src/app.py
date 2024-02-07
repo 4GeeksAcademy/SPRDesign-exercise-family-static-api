@@ -36,9 +36,7 @@ def family_structure():
 # Endpoint get a new member by id
 
 @app.route('/member/<int:member_id>', methods=['GET'])
-
 def get_member_id(member_id):
-
     member = jackson_family.get_member(member_id)
     
     if member:
@@ -52,29 +50,36 @@ def get_member_id(member_id):
 # Endpoint add a new member
     
 @app.route('/member', methods=['POST'])
-
 def add_member():
-    data = request.get_json()
+    new_member = request.get_json()
 
-    jackson_family.add_member(data)
+    if new_member:
+        jackson_family.add_member(new_member)
+        return jsonify({"message": "Member added successfully"}), 200
+    
+    elif new_member:
+        return jsonify({"error":"Invalid request"}), 400
+    
+    else:
+        return jsonify({"error":"Internal Server Error"}), 500
 
-    return jsonify({"message": "Member added successfully"}), 200
 
 # Endpoint delete a member by id
 
 @app.route('/member/<int:member_id>', methods=['DELETE'])
-
 def delete_member(member_id):
     member = jackson_family.get_member(member_id)
 
     if member:
         jackson_family.delete_member(member_id)
         return jsonify({"done": True}), 200
+    
+    elif member:
+        return jsonify({"error": "Invalid request"}), 400
+    
     else:
-        return jsonify({"error": "Member not found"}), 400
-
-
-
+        return jsonify({"error":"Internal Server Error"}), 500
+    
 
 # this only runs if `$ python src/app.py` is executed
 if __name__ == '__main__':
